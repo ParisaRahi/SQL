@@ -1,0 +1,116 @@
+
+Oppgave1:
+
+Tog(togNr, startStasjon, endeStasjon, ankomstTid)
+TogTabell(togNr, avgangsTid, stasjon)
+Plass(dato, togNr, vognNr, plassNr, vindu, ledig)
+
+CREATE TABLE Tog(
+             togNr int PRIMARY KEY,
+             startStasjon text NOT NULL, /* siden de er navn*/
+             endeStasjon text NOT NULL,
+             ankomstTid time NOT NULL,
+
+);
+
+CREATE TogTabell(
+             togNr int REFERENCES Tog(togNr),/* togNr i Tog er fremmed nøkkel til både TogTabell og Plass*/
+             avgangsTid timestamp,
+             stasjon text,
+             PRIMARY KEY (togNr, avgangsTid)
+);
+CREATE Plass(
+             dato date,
+             togNr int REFERENCES Tpg(togNr),
+             vognNr int,
+             plassNr int,
+             vindu boolean,
+             ledig boolean,
+             PRIMARY KEY(dato, togNr, vognNr,plassNr)
+);
+
+
+
+OPPGAVE2 :
+R(A, B, C, D, E, F, G)
+
+1. C,D,E → B
+2. A,F → B
+3. B → A
+4. B,C,F → D,E
+5. D → G
+
+{C,D,E}+ = {C,D,E,B,G}
+{A,F}+ = {A,F,B}
+{B}+ = {B,A}
+{B,C,F}+= {B,C,F,D,E,G,A} # suppernøkkel(siden inneholder alle andre attributter)
+{D}+ = {D,G}
+
+DELOPPGAVE a)
+Aldri på høyreside :
+{C,F}
+/* dvs at de to attributtene må være med i kandidatnøkkel.*/
+
+Bare på høyreside:
+{G}
+/*kan ikke være med i kandidatnøkkel*/
+
+Først må vi sjekke at {C,F} alene er kandidatnøkkel:
+{C,F}+ = {C,F} /*siden den ikke inneholder alle attributter, da er den ikke kandidatnøkkel.
+
+Forsøker å utvide med: {C,D,E} , {A,F} , {B}, {B,C,F}, {D}
+
+kandidatnøkler(minimal suppernøkkel):
+{C,F,D,E}+ = {C,F,D,E,B,A,G}
+{C,F,A}+ = {C,F,A,B,D,E,G}
+{C,F,B}+ = {C,F,B,A,D,E,G}
+
+DELOPPGAVE b)
+
+1. C,D,E → B
+   {C,D,E}+ = {C,D,E,B,A,G} er ikke suppernøkkel, så brudd på BCNF.
+                            siden B er nøkkelattributt(er med i kandidatnøkkel),
+                            så 3NF sålangt.
+
+2. A,F → B
+   {A,F}+= {A,F,B} er ikke suppernøkkel, dermed brudd på BCNF,
+                   siden B er nøkkelattributt, så 3NF sålangt.
+
+3. B → A
+   {B}+= {B,A} er ikke suppernøkkel, så brudd på BCNF.
+              A er nøkkelattributt, så 3NF sålangt.
+
+4. B,C,F → D,E
+   {B,C,F}+ = {B,C,F,D,E,G,A} siden {B,C,F} er suppernøkkel, så BCNF sålangt
+
+5. D → G
+   {D}+ = {D,G} er ikke suppernøkkel, så brudd på BCNF.
+                siden G ikke er nøkkelattributt, så brudd på 3NF.
+                siden D er en del av kandidatnøkkel, så brudd på 2NF.
+                så relasjonen R er på 1NF på det laveste nivå.
+
+høyeste normalformen på relasjonen R er :  B,C,F → D,E (BCNF)
+lavestenormalformen på relasjonen R er :  D → G (1NF)
+
+DELOPPGAVE c)
+1. C,D,E → B
+   {C,D,E}+ = {C,D,E,B,A,G}
+   s1(C,D,E,F) -> BCNF, fordi relasjonen ikke inneholder noe FD som brytter med BCNF
+   s2(C,D,E,B,A,G) -> FD1, FD3, FD5
+
+3. B → A
+   {B}+= {B,A}
+   s21(A,B)-> BCNF
+   s22(B,C,D,E,G) -> siden den inneholder FD5 , da brytter den BCNF
+
+
+5. D → G
+   {D}+ = {D,G}
+   s221(D,G) -> BCNF
+   s222(D,A,B,C,E) -> BCNF fordi relasjonen ikke inneholder noe FD som bryter BCNF.
+
+Samlet får vi:
+s1(C,D,E,F)
+s21(A,B)
+s221(D,G)
+s222(D,A,B,C,E)
